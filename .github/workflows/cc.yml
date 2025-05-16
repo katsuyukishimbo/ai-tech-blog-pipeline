@@ -1,0 +1,21 @@
+name: CC – generate article + assets
+on:
+  push:
+    paths: ["content/draft/**"]
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npx ts-node scripts/generate-assets.ts
+      - name: commit outputs
+        run: |
+          git config --global user.email "bot@github.com"
+          git config --global user.name "github-actions[bot]"
+          git add .
+          git commit -m "feat(cc): auto-generated blog content" || true
+      - uses: peter-evans/create-pull-request@v6
